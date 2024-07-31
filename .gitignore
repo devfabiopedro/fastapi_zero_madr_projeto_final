@@ -32,3 +32,4 @@ cython_debug/
 .vscode
 .ruff*
 .pytest*
+*.db
