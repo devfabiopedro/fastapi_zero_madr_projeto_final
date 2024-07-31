@@ -21,26 +21,44 @@ Para executar este projeto, você precisará ter instalado:
 
 ```bash
 git clone https://github.com/devfabiopedro/fastapi_zero_madr_projeto_final.git
+```
+```bash
+Vá para o diretório da aplicação:
 cd fastapi_zero_madr_projeto_final
 ```
 
 2. Crie um ambiente virtual com o Poetry:
 
-```bash
+```
 poetry shell
 ```
 
 3. Instale as dependências do projeto:
 
-```bash
+```
 poetry install
 ```
 
 ## Uso
-Iniciar o servidor ASGI local Uvicorn, execute:
+O Taskipy é uma biblioteca Python que facilita a criação e execução de tarefas de automação.
+Neste projeto usei o [Taskipy](https://pypi.org/project/taskipy/)
 
+```
+No console da aplicação execute o comando:
+task --list
+```
+Vai listar todos os comandos disponíveis para Executar, Formatar e Testar a aplicação:
+```
+lint - Faz um linter no código.
+format - Formata o código corretamente.
+run - Executa a aplicação.
+test - Executas os testes unitários.
+post-test - Exibe relatório de cobertura.
+```
+
+Exemplo:
 ```bash
-uvicorn src.main:app --reload
+task run
 ```
 
 Abra o seu navegador, a aplicação estará disponível para ser executada no endereço local: `http://127.0.0.1:8000`.
