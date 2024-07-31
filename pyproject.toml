@@ -44,8 +44,8 @@ addopts = '-p no:warnings'
 
 # Configurações do Taskipy
 [tool.taskipy.tasks]
-lint = 'ruff check . && ruff check . --diff'
-format = 'ruff check . --fix && ruff format .'
-run = 'fastapi dev madr/app.py'
-test = 'pytest -s -x --cov=madr -vv'
-post-test = 'coverage html && python misc/coverage-report.py'
+lint = {cmd='ruff check . && ruff check . --diff', help='- Faz um linter no código.'}
+format = {cmd='ruff check . --fix && ruff format .', help='- Formata o código corretamente.'}
+run = {cmd='fastapi dev madr/app.py', help='- Executa a aplicação.'}
+test = {cmd='pytest -s -x --cov=madr -vv', help='- Executas os testes unitários.'}
+post-test = {cmd='coverage html && python misc/coverage-report.py', help='- Exibe relatório de cobertura.'}
