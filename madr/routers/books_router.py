@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 
-from madr.schemas import BookSchema
+from madr.schemas.book_schema import BookSchema
 
 router = APIRouter(prefix='/books', tags=['Books'])
 
