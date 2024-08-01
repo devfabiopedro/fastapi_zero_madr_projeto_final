@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import FastAPI
 
 from madr.routers import accounts_router, books_router, novelists_router
-from madr.schemas import MessageSchema
+from madr.schemas.message_schema import MessageSchema
 
 app = FastAPI(title='MADR')
 
