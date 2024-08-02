@@ -19,7 +19,7 @@ def test_create_user(client):
         'email': 'fernanda@email.com',
         'id': 1,
         'created_at': data['created_at'],
-        'updated_at': data['updated_at']
+        'updated_at': data['updated_at'],
     }
 
 
@@ -42,9 +42,10 @@ def test_read_users_with_users(client, user):
     assert response.json() == {'accounts': [user_schema], 'total': 1}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/accounts/user/1',
+        f'/accounts/user/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'Adriana',
             'email': 'adriana@email.com',
@@ -58,11 +59,14 @@ def test_update_user(client, user):
         'email': 'adriana@email.com',
         'id': 1,
         'created_at': data['created_at'],
-        'updated_at': data['updated_at']
+        'updated_at': data['updated_at'],
     }
 
 
-def test_delete_user(client, user):
-    response = client.delete('/accounts/user/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/accounts/user/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'Account deleted'}
