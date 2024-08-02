@@ -1,14 +1,16 @@
-from fastapi import APIRouter, status
+from http import HTTPStatus
+
+from fastapi import APIRouter
 
 from madr.schemas.book_schema import BookSchema
 
 router = APIRouter(prefix='/books', tags=['Books'])
 
 
-@router.get(
-    '/',
-    status_code=status.HTTP_200_OK,
+@router.post(
+    '/new',
+    status_code=HTTPStatus.CREATED,
     response_model=BookSchema,
-    name='Read and list all Books',
+    name='Create a new Book',
 )
-def read_books(): ...
+def create_book(): ...

@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,16 +13,21 @@ from madr.schemas.account_schema import (
     AccountSchema,
 )
 from madr.schemas.message_schema import MessageSchema
+from madr.security import get_current_user, get_password_hash
 
 router = APIRouter(prefix='/accounts', tags=['Accounts'])
+
+T_Session = Annotated[Session, Depends(get_session)]
+T_CurrentUser = Annotated[Account, Depends(get_current_user)]
 
 
 @router.post(
     '/user',
     status_code=HTTPStatus.CREATED,
     response_model=AccountPublicSchema,
+    name='Create an new Account User',
 )
-def create_user(user: AccountSchema, session: Session = Depends(get_session)):
+def create_user(user: AccountSchema, session: T_Session):
     db_user = session.scalar(
         select(Account).where(
             (Account.username == user.username) | (Account.email == user.email)
@@ -40,8 +46,10 @@ def create_user(user: AccountSchema, session: Session = Depends(get_session)):
                 detail='Email already exists',
             )
 
+    hashed_password = get_password_hash(user.password)
+
     db_user = Account(
-        username=user.username, password=user.password, email=user.email
+        username=user.username, email=user.email, password=hashed_password
     )
     session.add(db_user)
     session.commit()
@@ -52,48 +60,57 @@ def create_user(user: AccountSchema, session: Session = Depends(get_session)):
 
 @router.get(
     '/list',
-    status_code=status.HTTP_200_OK,
+    status_code=HTTPStatus.OK,
     response_model=AccountListSchema,
-    name='Read and list all Accounts',
+    name='Read and list all Users Accounts',
 )
-def read_users(
-    skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
-):
+def read_users(session: T_Session, skip: int = 0, limit: int = 100):
     users = session.scalars(select(Account).offset(skip).limit(limit)).all()
     total_users = session.query(Account).count()
     return {'accounts': users, 'total': total_users}
 
 
-@router.put('/user/{user_id}', response_model=AccountPublicSchema)
+@router.put(
+    '/user/{user_id}',
+    response_model=AccountPublicSchema,
+    name='Update an User Data',
+)
 def update_user(
-    user_id: int, user: AccountSchema, session: Session = Depends(get_session)
+    user_id: int,
+    user: AccountSchema,
+    session: T_Session,
+    current_user: T_CurrentUser,
 ):
-
-    db_user = session.scalar(select(Account).where(Account.id == user_id))
-    if not db_user:
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User accont not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    db_user.username = user.username
-    db_user.password = user.password
-    db_user.email = user.email
+    current_user.username = user.username
+    current_user.password = get_password_hash(user.password)
+    current_user.email = user.email
     session.commit()
-    session.refresh(db_user)
+    session.refresh(current_user)
 
-    return db_user
+    return current_user
 
 
-@router.delete('/user/{user_id}', response_model=MessageSchema)
-def delete_user(user_id: int, session: Session = Depends(get_session)):
-    db_user = session.scalar(select(Account).where(Account.id == user_id))
-
-    if not db_user:
+@router.delete(
+    '/user/{user_id}',
+    response_model=MessageSchema,
+    name='Delete an User Account',
+)
+def delete_user(
+    user_id: int,
+    session: T_Session,
+    current_user: T_CurrentUser,
+):
+    if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User account not found'
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    session.delete(db_user)
+    session.delete(current_user)
     session.commit()
 
     return {'message': 'Account deleted'}
