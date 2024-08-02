@@ -7,11 +7,7 @@ from sqlalchemy.pool import StaticPool
 from madr.app import app
 from madr.database import get_session
 from madr.models import Account, table_registry
-
-
-@pytest.fixture
-def client():
-    return TestClient(app)
+from madr.security import get_password_hash
 
 
 @pytest.fixture
@@ -46,10 +42,23 @@ def user(session):
     user = Account(
         username='AccountTest',
         email='account.test@email.com',
-        password='accounttest'
+        password=get_password_hash('accounttest'),
     )
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    # Um 'monkey patch' para os testes
+    # não testarem em um hash, mas sim uma senha em texto
+    user.clean_password = 'accounttest'
+
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/auth/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    return response.json()['access_token']
