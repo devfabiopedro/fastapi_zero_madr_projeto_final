@@ -1,23 +1,30 @@
 <img src="https://i.imgur.com/3chUdCs.png" alt="MADR Logo">
 
-# [FastAPI do zero](https://fastapidozero.dunossauro.com/) - MADR projeto final do curso.
+## [FastAPI do zero](https://fastapidozero.dunossauro.com/)  
+# 📚 MADR - Projeto final.
 
-Projeto de implementação do projeto final do curso de FastAPI do [Eduardo Mendes @dunossauro](https://github.com/dunossauro/fastapi-do-zero) do canal [Live de Python](https://www.youtube.com/@Dunossauro).
+## 🌎 Pode ser visto funcionando aqui:  
+- 🚧 link ainda não disponível  
+
+Projeto final do curso de FastAPI do [Eduardo Mendes @dunossauro](https://github.com/dunossauro/fastapi-do-zero) do canal [Live de Python](https://www.youtube.com/@Dunossauro).
 
  
-## Descrição do Projeto
+## 📙Descrição deste Projeto:
 
-Implementação e publicação do projeto final.
-O objetivo é aplicar todos os conceitos aprendidos ao longo do curso para desenvolver uma API completa e funcional utilizando FastAPI.
+Implementação de um sistema simples de gerenciamento de livros e romances.  
 
-## Requisitos do projeto
+O MADR ( Meu Acervo de Romances ), deve seguir estas [orientações de projeto](https://fastapidozero.dunossauro.com/14/).
+
+O principal objetivo é poder aplicar todos os conhecimentos adquiridos ao longo do treinamento, mostrando e executando os passos necessários para garantir o desenvolvimento correto uma API REST completa, funcional e escalável se utilizando do FastAPI.
+
+## 🛠️ Os requisitos do projeto:
 
 Para executar este projeto, você precisará ter instalado:
 
-- Python 3.11 ou superior **(recomendação do autor)**
-- [Poetry](https://python-poetry.org/) (Gerenciador de pacotes do Python)
+- Python 3.11 ou superior **(recomendação do autor, versão mínima)**
+- [Poetry 1.8.3 ou superior](https://python-poetry.org/) (Gerenciador de pacotes do Python)
 
-## Instalação
+## 🖥️ Instalação:
 
 1. Clone o repositório:
 
@@ -41,7 +48,7 @@ poetry shell
 poetry install
 ```
 
-## Uso
+## 🚀 Uso:
 O Taskipy é uma biblioteca Python que facilita a criação e execução de tarefas de automação.
 Neste projeto usei o [Taskipy](https://pypi.org/project/taskipy/)
 
@@ -58,7 +65,7 @@ test - Executas os testes unitários.
 post-test - Exibe relatório de cobertura.
 ```
 
-Exemplo:
+Executa o projeto:
 ```bash
 task run
 ```
