@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from http import HTTPStatus
 from typing import Annotated
 
@@ -7,13 +9,11 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account
-from madr.schemas.account_schema import (
-    AccountListSchema,
-    AccountPublicSchema,
-    AccountSchema,
-)
+from madr.schemas.account_schema import (AccountListSchema,
+                                         AccountPublicSchema, AccountSchema)
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user, get_password_hash
+from madr.utils import sanitize_text
 
 router = APIRouter(prefix='/accounts', tags=['Accounts'])
 
@@ -49,7 +49,9 @@ def create_user(user: AccountSchema, session: T_Session):
     hashed_password = get_password_hash(user.password)
 
     db_user = Account(
-        username=user.username, email=user.email, password=hashed_password
+        username= sanitize_text(user.username), 
+        email=sanitize_text(user.email), 
+        password=hashed_password
     )
     session.add(db_user)
     session.commit()
@@ -86,9 +88,9 @@ def update_user(
             status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
         )
 
-    current_user.username = user.username
+    current_user.username = sanitize_text(user.username)
+    current_user.email = sanitize_text(user.email)
     current_user.password = get_password_hash(user.password)
-    current_user.email = user.email
     session.commit()
     session.refresh(current_user)
 
