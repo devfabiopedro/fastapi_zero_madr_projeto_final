@@ -70,3 +70,26 @@ def test_delete_user(client, user, token):
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'Account deleted'}
+
+
+def test_update_user_with_wrong_user(client, other_user, token):
+    response = client.put(
+        f'/accounts/user/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'username': 'Tester1',
+            'email': 'tester1@email.com',
+            'password': 'tester1',
+        },
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
+
+
+def test_delete_user_wrong_user(client, other_user, token):
+    response = client.delete(
+        f'/accounts/user/{other_user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json() == {'detail': 'Not enough permissions'}
