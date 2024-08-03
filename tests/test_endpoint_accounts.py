@@ -47,7 +47,7 @@ def test_update_user(client, user, token):
         f'/accounts/user/{user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'Adriana',
+            'username': 'adriana',
             'email': 'adriana@email.com',
             'password': 'adrianapassword',
         },
@@ -55,7 +55,7 @@ def test_update_user(client, user, token):
     data = response.json()
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'Adriana',
+        'username': 'adriana',
         'email': 'adriana@email.com',
         'id': 1,
         'created_at': data['created_at'],
@@ -77,7 +77,7 @@ def test_update_user_with_wrong_user(client, other_user, token):
         f'/accounts/user/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'username': 'Tester1',
+            'username': 'tester1',
             'email': 'tester1@email.com',
             'password': 'tester1',
         },
