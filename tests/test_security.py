@@ -1,15 +1,14 @@
 from http import HTTPStatus
 
+import jwt
+import pytest
+from fastapi import HTTPException
 from freezegun import freeze_time
 from jwt import decode
 from pwdlib import PasswordHash
 
-from madr.security import (
-    create_access_token,
-    get_password_hash,
-    settings,
-    verify_password,
-)
+from madr.security import (Session, create_access_token, get_current_user,
+                           get_password_hash, settings, verify_password)
 
 
 def test_jwt():
@@ -52,7 +51,7 @@ def test_if_jwt_invalid_token(client):
         'accounts/user/1', headers={'Authorization': 'Bearer token-invalido'}
     )
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json() == {'detail': 'Could not validate credentials'}
+    assert response.json() == {'detail': 'Não autorizado'}
 
 
 def test_token_expired_after_time(client, user):
@@ -75,7 +74,7 @@ def test_token_expired_after_time(client, user):
             },
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Could not validate credentials'}
+        assert response.json() == {'detail': 'Não autorizado'}
 
 
 def test_token_inexistent_user(client):
@@ -84,7 +83,7 @@ def test_token_inexistent_user(client):
         data={'username': 'no_user@email.com', 'password': 'nouserpassword'},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json() == {'detail': 'Incorrect email or password'}
+    assert response.json() == {'detail': 'Email ou senha incorretos'}
 
 
 def test_token_wrong_password(client, user):
@@ -93,7 +92,7 @@ def test_token_wrong_password(client, user):
         data={'username': user.email, 'password': 'wrong_password'},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json() == {'detail': 'Incorrect email or password'}
+    assert response.json() == {'detail': 'Email ou senha incorretos'}
 
 
 def test_refresh_token(client, token):
@@ -125,4 +124,30 @@ def test_token_expired_dont_refresh(client, user):
             headers={'Authorization': f'Bearer {token}'},
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED
-        assert response.json() == {'detail': 'Could not validate credentials'}
+        assert response.json() == {'detail': 'Não autorizado'}
+
+
+@pytest.mark.asyncio()
+async def test_missing_sub_in_token(session: Session):
+    token = jwt.encode(
+        {}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )  # Token sem sub
+
+    with pytest.raises(HTTPException) as excinfo:
+        await get_current_user(session=session, token=token)
+
+    assert excinfo.value.status_code == HTTPStatus.UNAUTHORIZED
+    assert excinfo.value.detail == 'Could not validate credentials'
+
+
+@pytest.mark.asyncio()
+async def test_user_not_found_in_db(session: Session):
+    token = jwt.encode(
+        {'sub': 'carmem'}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+
+    with pytest.raises(HTTPException) as excinfo:
+        await get_current_user(session=session, token=token)
+
+    assert excinfo.value.status_code == HTTPStatus.UNAUTHORIZED
+    assert excinfo.value.detail == 'Could not validate credentials'

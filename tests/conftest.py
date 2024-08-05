@@ -1,15 +1,18 @@
 import factory
 import pytest
+from faker import Faker
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
+from testcontainers.postgres import PostgresContainer
 
 from madr.app import app
 from madr.database import get_session
-from madr.models import Account, table_registry
+from madr.models import Account, Book, table_registry
 from madr.security import get_password_hash
 
+fake = Faker()
 
 class UserFactory(factory.Factory):
     class Meta:
@@ -20,6 +23,23 @@ class UserFactory(factory.Factory):
         lambda obj: f'{obj.username}@email.com'.lower()
     )
     password = factory.LazyAttribute(lambda obj: f'{obj.username}'.lower())
+
+
+class BookFactory(factory.Factory):
+    class Meta:
+        model = Book
+
+    year = factory.Faker('year')
+    title = factory.LazyFunction(lambda: fake.sentence(nb_words=4).lower())
+    novelist_id = factory.Sequence(lambda n: n + 1)
+    
+
+@pytest.fixture(scope='session')
+def engine():
+    with PostgresContainer('postgres:16', driver='psycopg') as postgres:
+        _engine = create_engine(postgres.get_connection_url())
+        with _engine.begin():
+            yield _engine
 
 
 @pytest.fixture
@@ -86,3 +106,12 @@ def token(client, user):
         data={'username': user.email, 'password': user.clean_password},
     )
     return response.json()['access_token']
+
+
+@pytest.fixture
+def book(session):
+    book = BookFactory()
+    session.add(book)
+    session.commit()
+    session.refresh(book)
+    return book

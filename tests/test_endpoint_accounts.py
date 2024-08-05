@@ -23,10 +23,50 @@ def test_create_user(client):
     }
 
 
-def test_read_users(client):
+def test_if_user_exists(client, user):
+    new_user_data = {
+        'username': user.username,
+        'email': 'user@email.com',
+        'password': 'userpassword',
+    }
+
+    response = client.post('accounts/user', json=new_user_data)
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Conta já consta no MADR'}
+
+
+def test_if_email_exists(client, user):
+    new_user_data = {
+        'username': 'tester',
+        'email': user.email,
+        'password': 'userpassword',
+    }
+    response = client.post('accounts/user', json=new_user_data)
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Conta já consta no MADR'}
+
+
+def test_read_all_users(client):
     response = client.get('/accounts/list')
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'accounts': [], 'total': 0}
+
+
+def test_read_one_exists_user(client):
+    new_user_data = {
+        'username': 'tester',
+        'email': 'tester@email.com',
+        'password': 'userpassword',
+    }
+    response = client.post('accounts/user', json=new_user_data)
+    response = client.get('accounts/1')
+    assert response.status_code == HTTPStatus.OK
+
+
+def test_if_read_one_user_not_found(client):
+    response = client.get('accounts/1')
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Conta não encontrada'}
 
 
 def test_read_users_with_users(client, user):
@@ -82,8 +122,8 @@ def test_update_user_with_wrong_user(client, other_user, token):
             'password': 'tester1',
         },
     )
-    assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json() == {'detail': 'Not enough permissions'}
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Não autorizado'}
 
 
 def test_delete_user_wrong_user(client, other_user, token):
@@ -91,5 +131,5 @@ def test_delete_user_wrong_user(client, other_user, token):
         f'/accounts/user/{other_user.id}',
         headers={'Authorization': f'Bearer {token}'},
     )
-    assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json() == {'detail': 'Not enough permissions'}
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Não autorizado'}

@@ -1,5 +1,7 @@
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from madr.database import get_session
 from madr.models import Account
 
 
@@ -13,3 +15,14 @@ def test_create_user(session):
     user = session.scalar(select(Account).where(Account.username == 'fabio'))
 
     assert user.username == 'fabio'
+
+
+def test_get_session(session, engine, mocker):
+    mocker.patch('madr.database.engine', engine)
+
+    session_generator = get_session()
+    generated_session = next(session_generator)
+
+    assert isinstance(generated_session, Session)
+    assert generated_session.bind.url == engine.url
+    session_generator.close()
