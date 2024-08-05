@@ -5,5 +5,5 @@ class MessageSchema(BaseModel):
     message: str
 
 
-class ErrorDetail(BaseModel):
+class ErrorDetailSchema(BaseModel):
     detail: str
