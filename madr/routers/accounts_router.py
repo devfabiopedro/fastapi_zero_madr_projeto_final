@@ -1,5 +1,3 @@
-import re
-import unicodedata
 from http import HTTPStatus
 from typing import Annotated
 
@@ -9,8 +7,11 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account
-from madr.schemas.account_schema import (AccountListSchema,
-                                         AccountPublicSchema, AccountSchema)
+from madr.schemas.account_schema import (
+    AccountListSchema,
+    AccountPublicSchema,
+    AccountSchema,
+)
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user, get_password_hash
 from madr.utils import sanitize_text
@@ -37,21 +38,21 @@ def create_user(user: AccountSchema, session: T_Session):
     if db_user:
         if db_user.username == user.username:
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail='Username already exists',
+                status_code=HTTPStatus.CONFLICT,
+                detail='Conta já consta no MADR',
             )
         elif db_user.email == user.email:
             raise HTTPException(
-                status_code=HTTPStatus.BAD_REQUEST,
-                detail='Email already exists',
+                status_code=HTTPStatus.CONFLICT,
+                detail='Conta já consta no MADR',
             )
 
     hashed_password = get_password_hash(user.password)
 
     db_user = Account(
-        username= sanitize_text(user.username), 
-        email=sanitize_text(user.email), 
-        password=hashed_password
+        username=sanitize_text(user.username),
+        email=sanitize_text(user.email),
+        password=hashed_password,
     )
     session.add(db_user)
     session.commit()
@@ -72,6 +73,23 @@ def read_users(session: T_Session, skip: int = 0, limit: int = 100):
     return {'accounts': users, 'total': total_users}
 
 
+@router.get(
+    '/{user_id}',
+    status_code=HTTPStatus.OK,
+    response_model=AccountPublicSchema,
+    name='Find one User account by id',
+)
+def read_one_user(user_id: int, session: T_Session):
+    user = session.scalar(select(Account).where((Account.id == user_id)))
+
+    if not user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='Conta não encontrada'
+        )
+
+    return user
+
+
 @router.put(
     '/user/{user_id}',
     response_model=AccountPublicSchema,
@@ -85,7 +103,8 @@ def update_user(
 ):
     if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail='Não autorizado',
         )
 
     current_user.username = sanitize_text(user.username)
@@ -109,7 +128,8 @@ def delete_user(
 ):
     if current_user.id != user_id:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail='Não autorizado',
         )
 
     session.delete(current_user)

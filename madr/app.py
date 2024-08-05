@@ -1,13 +1,11 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from madr.routers import (
-    accounts_router,
-    auth_router,
-    books_router,
-    novelists_router,
-)
+from madr.routers import (accounts_router, auth_router, books_router,
+                          novelists_router)
 from madr.schemas.message_schema import MessageSchema
 
 tags_metadata = [
@@ -34,6 +32,20 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     swagger_ui_parameters={'defaultModelsExpandDepth': 0},
 )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code == HTTPStatus.UNAUTHORIZED:
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={'detail': 'Não autorizado'},
+        )
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={'detail': exc.detail},
+    )
+
 
 app.include_router(accounts_router.router)
 app.include_router(books_router.router)
