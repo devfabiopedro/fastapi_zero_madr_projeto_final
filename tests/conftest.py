@@ -14,6 +14,7 @@ from madr.security import get_password_hash
 
 fake = Faker()
 
+
 class UserFactory(factory.Factory):
     class Meta:
         model = Account
@@ -32,7 +33,7 @@ class BookFactory(factory.Factory):
     year = factory.Faker('year')
     title = factory.LazyFunction(lambda: fake.sentence(nb_words=4).lower())
     novelist_id = factory.Sequence(lambda n: n + 1)
-    
+
 
 @pytest.fixture(scope='session')
 def engine():

@@ -7,8 +7,14 @@ from freezegun import freeze_time
 from jwt import decode
 from pwdlib import PasswordHash
 
-from madr.security import (Session, create_access_token, get_current_user,
-                           get_password_hash, settings, verify_password)
+from madr.security import (
+    Session,
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+    settings,
+    verify_password,
+)
 
 
 def test_jwt():
@@ -127,7 +133,7 @@ def test_token_expired_dont_refresh(client, user):
         assert response.json() == {'detail': 'Não autorizado'}
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_missing_sub_in_token(session: Session):
     token = jwt.encode(
         {}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -140,7 +146,7 @@ async def test_missing_sub_in_token(session: Session):
     assert excinfo.value.detail == 'Could not validate credentials'
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_user_not_found_in_db(session: Session):
     token = jwt.encode(
         {'sub': 'carmem'}, settings.SECRET_KEY, algorithm=settings.ALGORITHM

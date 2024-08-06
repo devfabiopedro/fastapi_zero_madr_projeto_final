@@ -81,10 +81,59 @@ def test_if_book_exists(client, book, token):
 
 
 def test_read_books_filter_by_title(client, book):
-    response = client.get("/books/list", params={"title": book.title,"year":book.year})
-    assert response.status_code == 200
+    response = client.get(
+        '/books/list',
+        params={'title': book.title, 'year': book.year},
+    )
+    assert response.status_code == HTTPStatus.OK
     data = response.json()
-    assert len(data["books"]) == 1
-    assert data["books"][0]["title"] == book.title
-    assert data["books"][0]["year"] == book.year
-  
+    assert len(data['books']) == 1
+    assert data['books'][0]['title'] == book.title
+    assert data['books'][0]['year'] == book.year
+
+
+def test_patch_book_error(client, token):
+    response = client.patch(
+        '/books/1',
+        json={
+            'year': 'string',
+            'title': 'string',
+            'novelist_id': 0,
+        },
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Livro não consta no MADR'}
+
+
+def test_patch_book(client, book, token):
+    response = client.patch(
+        f'/books/{book.id}',
+        json={
+            'year': 'string',
+            'title': 'um livro qualquer!',
+            'novelist_id': 0,
+        },
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()['title'] == 'um livro qualquer!'
+
+
+def test_delete_book(client, book, token):
+    response = client.delete(
+        f'/books/{book.id}',
+        headers={
+            'Authorization': f'Bearer {token}',
+        },
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'message': 'Livro deletado no MADR'}
+
+
+def test_delete_book_error(client, token):
+    response = client.delete(
+        '/books/2', headers={'Authorization': f'Bearer {token}'}
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {'detail': 'Livro não consta no MADR'}
