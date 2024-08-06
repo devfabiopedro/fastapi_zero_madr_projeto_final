@@ -1,7 +1,5 @@
 from http import HTTPStatus
 
-from madr.schemas.account_schema import AccountPublicSchema
-
 
 def test_create_user(client):
     response = client.post(

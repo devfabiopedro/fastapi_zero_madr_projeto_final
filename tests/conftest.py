@@ -9,7 +9,7 @@ from testcontainers.postgres import PostgresContainer
 
 from madr.app import app
 from madr.database import get_session
-from madr.models import Account, Book, table_registry
+from madr.models import Account, Book, Novelist, table_registry
 from madr.security import get_password_hash
 
 fake = Faker()
@@ -33,6 +33,15 @@ class BookFactory(factory.Factory):
     year = factory.Faker('year')
     title = factory.LazyFunction(lambda: fake.sentence(nb_words=4).lower())
     novelist_id = factory.Sequence(lambda n: n + 1)
+
+
+class NovelistFactory(factory.Factory):
+    class Meta:
+        model = Novelist
+
+    name = factory.LazyAttribute(
+        lambda _: f"{fake.first_name().lower()} {fake.last_name().lower()}"
+    )
 
 
 @pytest.fixture(scope='session')
@@ -116,3 +125,12 @@ def book(session):
     session.commit()
     session.refresh(book)
     return book
+
+
+@pytest.fixture
+def novelist(session):
+    writter = NovelistFactory()
+    session.add(writter)
+    session.commit()
+    session.refresh(writter)
+    return writter
