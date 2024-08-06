@@ -24,3 +24,9 @@ class PaginatedBooksResponse(BaseModel):
     page: int
     per_page: int
     total_pages: int
+
+
+class BookUpdateSchema(BaseModel):
+    year: str | None = None
+    title: str | None = None
+    novelist_id: int
