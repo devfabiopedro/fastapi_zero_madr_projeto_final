@@ -7,11 +7,8 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account
-from madr.schemas.account_schema import (
-    AccountListSchema,
-    AccountPublicSchema,
-    AccountSchema,
-)
+from madr.schemas.account_schema import (AccountListSchema,
+                                         AccountPublicSchema, AccountSchema)
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user, get_password_hash
 from madr.utils import sanitize_text
@@ -60,34 +57,35 @@ def create_user(user: AccountSchema, session: T_Session):
 
     return db_user
 
+# Implementado, Mas não está em uso por regra do projeto final.
+# @router.get(
+#     '/list',
+#     status_code=HTTPStatus.OK,
+#     response_model=AccountListSchema,
+#     name='Read and list all Users Accounts',
+# )
+# def read_users(session: T_Session, skip: int = 0, limit: int = 100):
+#     users = session.scalars(select(Account).offset(skip).limit(limit)).all()
+#     total_users = session.query(Account).count()
+#     return {'accounts': users, 'total': total_users}
 
-@router.get(
-    '/list',
-    status_code=HTTPStatus.OK,
-    response_model=AccountListSchema,
-    name='Read and list all Users Accounts',
-)
-def read_users(session: T_Session, skip: int = 0, limit: int = 100):
-    users = session.scalars(select(Account).offset(skip).limit(limit)).all()
-    total_users = session.query(Account).count()
-    return {'accounts': users, 'total': total_users}
 
+# Implementado, Mas não está em uso por regra do projeto final.
+# @router.get(
+#     '/{user_id}',
+#     status_code=HTTPStatus.OK,
+#     response_model=AccountPublicSchema,
+#     name='Find one User account by id',
+# )
+# def read_one_user(user_id: int, session: T_Session):
+#     user = session.scalar(select(Account).where((Account.id == user_id)))
 
-@router.get(
-    '/{user_id}',
-    status_code=HTTPStatus.OK,
-    response_model=AccountPublicSchema,
-    name='Find one User account by id',
-)
-def read_one_user(user_id: int, session: T_Session):
-    user = session.scalar(select(Account).where((Account.id == user_id)))
+#     if not user:
+#         raise HTTPException(
+#             status_code=HTTPStatus.NOT_FOUND, detail='Conta não encontrada'
+#         )
 
-    if not user:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='Conta não encontrada'
-        )
-
-    return user
+#     return user
 
 
 @router.put(
@@ -110,6 +108,7 @@ def update_user(
     current_user.username = sanitize_text(user.username)
     current_user.email = sanitize_text(user.email)
     current_user.password = get_password_hash(user.password)
+
     session.commit()
     session.refresh(current_user)
 
@@ -135,4 +134,4 @@ def delete_user(
     session.delete(current_user)
     session.commit()
 
-    return {'message': 'Account deleted'}
+    return {'message': 'Conta deletada com sucesso'}

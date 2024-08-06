@@ -10,8 +10,10 @@ from madr.models import Account, Book
 from madr.schemas.book_schema import (
     BookPublicSchema,
     BookSchema,
+    BookUpdateSchema,
     PaginatedBooksResponse,
 )
+from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user
 
 router = APIRouter(prefix='/books', tags=['Books'])
@@ -104,71 +106,58 @@ def read_one_book(book_id: int, session: T_Session):
     return book
 
 
-# @router.delete('/livro/{id}', status_code=status.HTTP_200_OK)
-# def delete_book(id: int, current_user: CurrentUser, db: DBSession):
-#     delete_book_service(id, db)
-#     return Message(message='Livro deletado no MADR')
+@router.patch(
+    '/{book_id}',
+    response_model=BookPublicSchema,
+    name='Update a Book Data',
+)
+def patch_book(
+    book_id: int,
+    session: T_Session,
+    current_user: T_CurrentUser,
+    book: BookUpdateSchema,
+):
+    db_book = session.scalar(select(Book).where(Book.id == book_id))
+
+    if not db_book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='Livro não consta no MADR'
+        )
+
+    schema_values = {'year': 'string', 'title': 'string', 'novelist_id': 0}
+
+    book.title = book.title.lower()
+
+    for key, value in book.model_dump(exclude_unset=True).items():
+        # Verifica se o valor não é igual ao valor padrão do schema
+        if value != schema_values.get(key, None):
+            setattr(db_book, key, value)
+
+    session.add(db_book)
+    session.commit()
+    session.refresh(db_book)
+
+    return db_book
 
 
-# @router.patch(
-#     '/livro/{id}',
-#     status_code=status.HTTP_200_OK,
-#     response_model=UpdateBookRequestSchema,
-# )
-# def update_book(
-#     id: int,
-#     data: UpdateBookRequestSchema,
-#     current_user: CurrentUser,
-#     db: DBSession,
-# ):
-#     new_book = update_book_service(id, data, db)
-#     return UpdateBookRequestSchema(
-#         id=new_book.id,
-#         ano=new_book.year,
-#         titulo=new_book.title,
-#         romancista_id=new_book.author_id,
-#     )
+@router.delete(
+    '/{book_id}',
+    response_model=MessageSchema,
+    name='Delete one Book',
+)
+def delete_book(
+    book_id: int,
+    session: T_Session,
+    current_user: T_CurrentUser,
+):
+    book = session.scalar(select(Book).where(Book.id == book_id))
 
+    if not book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='Livro não consta no MADR'
+        )
 
-# @router.get(
-#     '/livro/{id}',
-#     status_code=status.HTTP_200_OK,
-#     response_model=GetBookResponseSchema,
-# )
-# def get_book(id: int, db: DBSession):
-#     book = get_book_service({'id': id}, db=db)
-#     return GetBookResponseSchema(
-#         id=book.id,
-#         ano=book.year,
-#         titulo=book.title,
-#         romancista_id=book.author_id,
-#     )
+    session.delete(book)
+    session.commit()
 
-
-# @router.get(
-#     '/livro',
-#     status_code=status.HTTP_200_OK,
-#     response_model=GetManyBooksResponseSchema,
-# )
-# def get_books(
-#     db: DBSession,
-#     year: int | None = Query(None, alias='ano'),
-#     title: str | None = Query(None, alias='titulo'),
-#     page: int = Query(1, alias='pagina'),
-# ):
-#     where = {}
-#     if year:
-#         where['year'] = year
-#     if title:
-#         where['title'] = title
-#     books = get_books_service(where, db, page)
-#     books = [
-#         GetBookResponseSchema(
-#             id=book.id,
-#             ano=book.year,
-#             titulo=book.title,
-#             romancista_id=book.author_id,
-#         )
-#         for book in books
-#     ]
-#     return GetManyBooksResponseSchema(livros=books)
+    return {'message': 'Livro deletado no MADR'}
