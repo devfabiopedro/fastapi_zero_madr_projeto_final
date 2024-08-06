@@ -7,8 +7,10 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account
-from madr.schemas.account_schema import (AccountListSchema,
-                                         AccountPublicSchema, AccountSchema)
+from madr.schemas.account_schema import (
+    AccountPublicSchema,
+    AccountSchema,
+)
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user, get_password_hash
 from madr.utils import sanitize_text

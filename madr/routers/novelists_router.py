@@ -37,7 +37,7 @@ def create_novelist(
     if db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Novelista já consta no MADR',
+            detail='Romancista já consta no MADR',
         )
 
     db_novelist = Novelist(name=novelist.name.lower())
@@ -88,12 +88,14 @@ def read_novelists(
     name='Find one Novelist by id',
 )
 def read_one_novelist(novelist_id: int, session: T_Session):
-    novelist = session.scalar(select(Novelist).where((Novelist.id == novelist_id)))
+    novelist = session.scalar(
+        select(Novelist).where((Novelist.id == novelist_id))
+    )
 
     if not novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Novelista não consta no MADR'
+            detail='Romancista não consta no MADR'
         )
 
     return novelist
@@ -102,7 +104,7 @@ def read_one_novelist(novelist_id: int, session: T_Session):
 @router.patch(
     '/{novelist_id}',
     response_model=NovelistPublicSchema,
-    name='Update a Novelist',
+    name='Update an Novelist',
 )
 def patch_novelist(
     novelist_id: int,
@@ -110,7 +112,9 @@ def patch_novelist(
     current_user: T_CurrentUser,
     novelist: NovelistUpdateSchema,
 ):
-    db_novelist = session.scalar(select(Novelist).where(Novelist.id == novelist_id))
+    db_novelist = session.scalar(
+        select(Novelist).where(Novelist.id == novelist_id)
+    )
 
     if not db_novelist:
         raise HTTPException(
@@ -137,14 +141,16 @@ def patch_novelist(
 @router.delete(
     '/{novelist_id}',
     response_model=MessageSchema,
-    name='Delete one Book',
+    name='Delete an Novelist',
 )
 def delete_novelist(
     novelist_id: int,
     session: T_Session,
     current_user: T_CurrentUser,
 ):
-    novelist = session.scalar(select(Novelist).where(Novelist.id == novelist_id))
+    novelist = session.scalar(
+        select(Novelist).where(Novelist.id == novelist_id)
+    )
 
     if not novelist:
         raise HTTPException(
