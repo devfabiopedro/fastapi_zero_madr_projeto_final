@@ -21,4 +21,4 @@ RUN poetry install --no-interaction --no-ansi
 EXPOSE 8000
 
 # Comando para rodar o aplicativo
-CMD ["poetry", "run", "uvicorn", "--host", "0.0.0.0", "fastapi_madr.app:app"]
+CMD ["poetry", "run", "uvicorn", "--host", "0.0.0.0", "madr.app:app"]
