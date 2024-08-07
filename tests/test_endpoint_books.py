@@ -24,6 +24,7 @@ def test_allow_create_book_with_permissions(client, token):
         },
     )
     data = response.json()
+    ...
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
         'year': '2024',
@@ -33,7 +34,7 @@ def test_allow_create_book_with_permissions(client, token):
 
 
 def test_get_one_book(client, book):
-    response = client.get(f'books/{book.id}')
+    response = client.get(f'/books/{book.id}')
     assert response.status_code == HTTPStatus.OK
 
 

@@ -11,6 +11,7 @@ from madr.app import app
 from madr.database import get_session
 from madr.models import Account, Book, Novelist, table_registry
 from madr.security import get_password_hash
+from madr.settings import Settings
 
 fake = Faker()
 
@@ -52,22 +53,7 @@ def engine():
             yield _engine
 
 
-@pytest.fixture
-def session():
-    engine = create_engine(
-        'sqlite:///:memory:',
-        connect_args={'check_same_thread': False},
-        poolclass=StaticPool,
-    )
-    table_registry.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
-
-    table_registry.metadata.drop_all(engine)
-
-
-@pytest.fixture
+@pytest.fixture()
 def client(session):
     def get_session_override():
         return session
@@ -77,6 +63,16 @@ def client(session):
         yield client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture()
+def session(engine):
+    table_registry.metadata.create_all(engine)
+    with Session(engine) as session:
+        yield session
+        session.rollback()
+
+    table_registry.metadata.drop_all(engine)
 
 
 @pytest.fixture
