@@ -4,14 +4,12 @@ from faker import Faker
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqlalchemy.pool import StaticPool
 from testcontainers.postgres import PostgresContainer
 
 from madr.app import app
 from madr.database import get_session
 from madr.models import Account, Book, Novelist, table_registry
 from madr.security import get_password_hash
-from madr.settings import Settings
 
 fake = Faker()
 
@@ -33,7 +31,8 @@ class BookFactory(factory.Factory):
 
     year = factory.Faker('year')
     title = factory.LazyFunction(lambda: fake.sentence(nb_words=4).lower())
-    novelist_id = factory.Sequence(lambda n: n + 1)
+    novelist_id = 1
+    # novelist_id = factory.Sequence(lambda n: n + 1)
 
 
 class NovelistFactory(factory.Factory):
@@ -41,7 +40,7 @@ class NovelistFactory(factory.Factory):
         model = Novelist
 
     name = factory.LazyAttribute(
-        lambda _: f"{fake.first_name().lower()} {fake.last_name().lower()}"
+        lambda _: f'{fake.first_name().lower()} {fake.last_name().lower()}'
     )
 
 
@@ -53,7 +52,7 @@ def engine():
             yield _engine
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(session):
     def get_session_override():
         return session
@@ -65,7 +64,7 @@ def client(session):
     app.dependency_overrides.clear()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(engine):
     table_registry.metadata.create_all(engine)
     with Session(engine) as session:
