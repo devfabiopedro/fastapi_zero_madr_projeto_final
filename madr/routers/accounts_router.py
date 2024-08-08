@@ -59,6 +59,7 @@ def create_user(user: AccountSchema, session: T_Session):
 
     return db_user
 
+
 # Implementado, Mas não está em uso por regra do projeto final.
 # @router.get(
 #     '/list',

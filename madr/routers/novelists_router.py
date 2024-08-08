@@ -8,9 +8,12 @@ from sqlalchemy.orm import Session
 from madr.database import get_session
 from madr.models import Account, Novelist
 from madr.schemas.message_schema import MessageSchema
-from madr.schemas.novelist_schema import (NovelistPublicSchema, NovelistSchema,
-                                          NovelistUpdateSchema,
-                                          PaginatedNovelistsResponse)
+from madr.schemas.novelist_schema import (
+    NovelistPublicSchema,
+    NovelistSchema,
+    NovelistUpdateSchema,
+    PaginatedNovelistsResponse,
+)
 from madr.security import get_current_user
 
 router = APIRouter(prefix='/novelists', tags=['Novelists'])
@@ -95,7 +98,7 @@ def read_one_novelist(novelist_id: int, session: T_Session):
     if not novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Romancista não consta no MADR'
+            detail='Romancista não consta no MADR',
         )
 
     return novelist
@@ -119,7 +122,7 @@ def patch_novelist(
     if not db_novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Romancista não consta no MADR'
+            detail='Romancista não consta no MADR',
         )
 
     schema_values = {'name': 'string'}
@@ -155,7 +158,7 @@ def delete_novelist(
     if not novelist:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
-            detail='Romancista não consta no MADR'
+            detail='Romancista não consta no MADR',
         )
 
     session.delete(novelist)

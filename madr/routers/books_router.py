@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from madr.database import get_session
-from madr.models import Account, Book
+from madr.models import Account, Book, Novelist
 from madr.schemas.book_schema import (
     BookPublicSchema,
     BookSchema,
@@ -43,6 +43,16 @@ def create_book(
             detail='Livro já consta no MADR',
         )
 
+    db_novelist = session.scalar(
+        select(Novelist).where(Novelist.id == book.novelist_id)
+    )
+
+    if not db_novelist:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Romancista não encontrado',
+        )
+
     db_book = Book(
         year=book.year, title=book.title.lower(), novelist_id=book.novelist_id
     )
@@ -63,7 +73,7 @@ def create_book(
 def read_books(
     session: T_Session,
     title: Optional[str] = None,
-    year: Optional[int] = None,
+    year: Optional[str] = None,
     page: int = 1,
     per_page: int = 20,
 ):
@@ -128,8 +138,18 @@ def patch_book(
 
     book.title = book.title.lower()
 
+    if book.novelist_id:
+        db_novelist = session.scalar(
+            select(Novelist).where(Novelist.id == book.novelist_id)
+        )
+
+        if not db_novelist:
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail='Romancista não encontrado',
+            )
+
     for key, value in book.model_dump(exclude_unset=True).items():
-        # Verifica se o valor não é igual ao valor padrão do schema
         if value != schema_values.get(key, None):
             setattr(db_book, key, value)
 
