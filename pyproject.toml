@@ -56,3 +56,6 @@ format = {cmd='ruff check . --fix && ruff format .', help='- Formata o código c
 run = {cmd='fastapi dev madr/app.py', help='- Executa a aplicação.'}
 test = {cmd='pytest -s -x --cov=madr -vv', help='- Executas os testes unitários.'}
 post-test = {cmd='coverage html && python misc/coverage-report.py', help='- Exibe relatório de cobertura.'}
+
+# Usar em caso de execução dentro de container Docker
+run-docker = {cmd='docker-compose up -d', help='- Inicia a aplicação no Docker em segundo plano.'}
