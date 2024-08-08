@@ -15,6 +15,8 @@
 **\issue.md
 **\misc
 **\.github
+**.env_local
+**.env.txt
 # flyctl launch added from .pytest_cache\.gitignore
 # Created by pytest automatically.
 .pytest_cache\**\*
