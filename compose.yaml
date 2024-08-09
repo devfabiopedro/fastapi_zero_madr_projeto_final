@@ -23,6 +23,8 @@ services:
       - "8000:8000"
     depends_on:
       - fastapi_madr_db
+    env_file:
+      - .env  
     environment:
       DATABASE_URL: postgresql+psycopg://app_user:app_password@fastapi_madr_db:5432/app_db
 
