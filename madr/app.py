@@ -4,8 +4,12 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from madr.routers import (accounts_router, auth_router, books_router,
-                          novelists_router)
+from madr.routers import (
+    accounts_router,
+    auth_router,
+    books_router,
+    novelists_router,
+)
 from madr.schemas.message_schema import MessageSchema
 
 tags_metadata = [
