@@ -2,12 +2,72 @@ import re
 import unicodedata
 
 
-# Função de Sanitização de texto.
-def sanitize_text(word: str) -> str:
-    # Normaliza o texto para decompor caracteres acentuados
-    word = unicodedata.normalize('NFKD', word)
-    # Remove diacríticos, como acentos
-    word = ''.join(c for c in word if not unicodedata.combining(c))
-    # Mantém apenas caracteres alfanuméricos, pontos e o sinal de '@'
-    word = re.sub(r'[^a-zA-Z0-9.@]', '', word)
-    return word.lower()
+def sanitize_name(name: str) -> str:
+    name = name.strip()
+    name = re.sub(r'\s+', ' ', name)
+    name_normalized = unicodedata.normalize('NFKD', name)
+    name_no_accents = ''.join(c for c in name_normalized if not unicodedata.combining(c))
+    name_no_specials = re.sub(r'[^a-zA-Z\s]', ' ', name_no_accents)
+    name_corrected = ''.join(
+        name[i] if name_no_accents[i] in name_no_specials else ' ' 
+        for i in range(len(name))
+    )
+    
+    name_corrected = name_corrected.lower()
+    name_corrected = re.sub(r'\s+', ' ', name_corrected)
+
+    return name_corrected.strip()
+
+
+# def sanitize_email(email: str) -> str:
+#     email = email.lower()
+#     email_normalized = unicodedata.normalize('NFKD', email)
+#     email_no_accents = ''.join(c for c in email_normalized if not unicodedata.combining(c))
+#     parts = email_no_accents.split('@')
+#     if len(parts) > 2:
+#         email_no_accents = f"{parts[0]}@{''.join(parts[1:])}"
+    
+#     if '@' not in email_no_accents:
+#         email_no_accents = f"{email_no_accents}@example.com"
+    
+#     local_part, domain_part = email_no_accents.split('@', 1)
+    
+#     local_part = re.sub(r'[^a-zA-Z0-9._-]', '', local_part)
+#     domain_part = re.sub(r'[^a-zA-Z0-9.-]', '', domain_part)
+    
+#     if not re.match(r'^.*\.com\.[a-zA-Z]{2,}$', domain_part):
+#         domain_part = re.sub(r'(\.com.*)', '.com', domain_part)
+#         domain_part = f"{domain_part}.br"
+    
+#     sanitized_email = f"{local_part}@{domain_part}"
+    
+#     return sanitized_email
+
+
+def sanitize_email(email: str) -> str:
+    email = email.lower()
+    email_normalized = unicodedata.normalize('NFKD', email)
+    email_no_accents = ''.join(c for c in email_normalized if not unicodedata.combining(c))
+
+    parts = email_no_accents.split('@')
+    if len(parts) > 2:
+        email_no_accents = f"{parts[0]}@{''.join(parts[1:])}"
+    
+    if '@' not in email_no_accents:
+        # Adiciona um sinal de @ padrão se não houver
+        email_no_accents = f"{email_no_accents}@example.com"
+    
+    local_part, domain_part = email_no_accents.split('@', 1)
+    
+    local_part = re.sub(r'[^a-zA-Z0-9._-]', '', local_part)
+    
+    domain_part = re.sub(r'[^a-zA-Z0-9.-]', '', domain_part)
+    
+    if not re.match(r'^.*\.com\.[a-zA-Z]{2,}$', domain_part):
+        # Mantém o domínio como está se terminar com ".com" e um domínio de país válido
+        domain_part = re.sub(r'(\.com.*)', '.com', domain_part)
+    
+    sanitized_email = f"{local_part}@{domain_part}"
+    
+    return sanitized_email
+
