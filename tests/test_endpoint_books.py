@@ -42,7 +42,7 @@ def test_try_create_book_without_novelist(client, token):
         },
     )
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail':'Romancista não encontrado'}
+    assert response.json() == {'detail': 'Romancista não encontrado'}
 
 
 def test_get_one_book(client, novelist, book):
@@ -143,7 +143,9 @@ def test_patch_book(client, novelist, book, token):
     assert response.json()['title'] == 'um livro qualquer!'
 
 
-def test_try_update_book_with_inexistent_novelist(client, novelist, book, token):
+def test_try_update_book_with_inexistent_novelist(
+    client, novelist, book, token
+):
     response = client.patch(
         f'/books/{book.id}',
         json={
@@ -154,7 +156,7 @@ def test_try_update_book_with_inexistent_novelist(client, novelist, book, token)
         headers={'Authorization': f'Bearer {token}'},
     )
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail':'Romancista não encontrado'}
+    assert response.json() == {'detail': 'Romancista não encontrado'}
 
 
 def test_delete_book(client, novelist, book, token):
