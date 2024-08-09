@@ -7,8 +7,12 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account, Book, Novelist
-from madr.schemas.book_schema import (BookPublicSchema, BookSchema,
-                                      BookUpdateSchema, PaginatedBooksResponse)
+from madr.schemas.book_schema import (
+    BookPublicSchema,
+    BookSchema,
+    BookUpdateSchema,
+    PaginatedBooksResponse,
+)
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user
 

@@ -9,8 +9,11 @@ from sqlalchemy.orm import Session
 from madr.database import get_session
 from madr.models import Account
 from madr.schemas.token_schema import Token
-from madr.security import (create_access_token, get_current_user,
-                           verify_password)
+from madr.security import (
+    create_access_token,
+    get_current_user,
+    verify_password,
+)
 
 router = APIRouter(prefix='/auth', tags=['Auth'])
 

@@ -8,9 +8,12 @@ from sqlalchemy.orm import Session
 from madr.database import get_session
 from madr.models import Account, Novelist
 from madr.schemas.message_schema import MessageSchema
-from madr.schemas.novelist_schema import (NovelistPublicSchema, NovelistSchema,
-                                          NovelistUpdateSchema,
-                                          PaginatedNovelistsResponse)
+from madr.schemas.novelist_schema import (
+    NovelistPublicSchema,
+    NovelistSchema,
+    NovelistUpdateSchema,
+    PaginatedNovelistsResponse,
+)
 from madr.security import get_current_user
 from madr.utils import sanitize_name
 
