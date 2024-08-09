@@ -8,13 +8,11 @@ from sqlalchemy.orm import Session
 from madr.database import get_session
 from madr.models import Account, Novelist
 from madr.schemas.message_schema import MessageSchema
-from madr.schemas.novelist_schema import (
-    NovelistPublicSchema,
-    NovelistSchema,
-    NovelistUpdateSchema,
-    PaginatedNovelistsResponse,
-)
+from madr.schemas.novelist_schema import (NovelistPublicSchema, NovelistSchema,
+                                          NovelistUpdateSchema,
+                                          PaginatedNovelistsResponse)
 from madr.security import get_current_user
+from madr.utils import sanitize_name
 
 router = APIRouter(prefix='/novelists', tags=['Novelists'])
 
@@ -34,7 +32,7 @@ def create_novelist(
     current_user: T_CurrentUser,
 ):
     db_novelist = session.scalar(
-        select(Novelist).where(Novelist.name == novelist.name.lower())
+        select(Novelist).where(Novelist.name == sanitize_name(novelist.name))
     )
 
     if db_novelist:
@@ -43,7 +41,7 @@ def create_novelist(
             detail='Romancista já consta no MADR',
         )
 
-    db_novelist = Novelist(name=novelist.name.lower())
+    db_novelist = Novelist(name=sanitize_name(novelist.name))
 
     session.add(db_novelist)
     session.commit()
@@ -127,7 +125,7 @@ def patch_novelist(
 
     schema_values = {'name': 'string'}
 
-    novelist.name = novelist.name.lower()
+    novelist.name = sanitize_name(novelist.name)
 
     for key, value in novelist.model_dump(exclude_unset=True).items():
         # Verifica se o valor não é igual ao valor padrão do schema

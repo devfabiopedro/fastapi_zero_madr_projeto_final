@@ -7,13 +7,10 @@ from sqlalchemy.orm import Session
 
 from madr.database import get_session
 from madr.models import Account
-from madr.schemas.account_schema import (
-    AccountPublicSchema,
-    AccountSchema,
-)
+from madr.schemas.account_schema import AccountPublicSchema, AccountSchema
 from madr.schemas.message_schema import MessageSchema
 from madr.security import get_current_user, get_password_hash
-from madr.utils import sanitize_text
+from madr.utils import sanitize_email, sanitize_name
 
 router = APIRouter(prefix='/accounts', tags=['Accounts'])
 
@@ -49,10 +46,11 @@ def create_user(user: AccountSchema, session: T_Session):
     hashed_password = get_password_hash(user.password)
 
     db_user = Account(
-        username=sanitize_text(user.username),
-        email=sanitize_text(user.email),
+        username=sanitize_name(user.username),
+        email=sanitize_email(user.email),
         password=hashed_password,
     )
+
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -108,8 +106,8 @@ def update_user(
             detail='Não autorizado',
         )
 
-    current_user.username = sanitize_text(user.username)
-    current_user.email = sanitize_text(user.email)
+    current_user.username = sanitize_name(user.username)
+    current_user.email = sanitize_email(user.email)
     current_user.password = get_password_hash(user.password)
 
     session.commit()
