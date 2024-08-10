@@ -516,6 +516,17 @@ files = [
 python-dateutil = ">=2.7"
 
 [[package]]
+name = "generate-dockerignore-from-gitignore"
+version = "0.1.3"
+description = ".dockerignore file generator based on .gitignore file(s)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "generate_dockerignore_from_gitignore-0.1.3-py2.py3-none-any.whl", hash = "sha256:887dca2b7ddfa5107c04d898647d780ce4bca49e7adac404e60c41881b25dd3a"},
+    {file = "generate_dockerignore_from_gitignore-0.1.3.tar.gz", hash = "sha256:9be8a93883bae92352dd77643c553b1d6428283f41afed9a6e4623437d1cb4b6"},
+]
+
+[[package]]
 name = "greenlet"
 version = "3.0.3"
 description = "Lightweight in-process concurrent programming"
@@ -2059,4 +2070,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f909ca7edf98817f7a822b69f4868037935fe5be073e18ace8acc93bc82d21ed"
+content-hash = "2d72a703df803797f08c9d04d902cd8f34591b69d6bb3339be8b54fb40ef4369"
