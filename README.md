@@ -25,6 +25,23 @@ Para executar este projeto, você precisará ter instalado:
 - Python 3.11 ou superior **(recomendação do autor, versão mínima)**
 - [Poetry 1.8.3 ou superior](https://python-poetry.org/) (Gerenciador de pacotes do Python)
 
+#### Dependências de projeto:
+- Fastapi 0.111.1
+- Alembic 1.13.2
+- Sqlalchemy 2.0.31
+- Pyjwt 2.9.0
+- Psycopg-binary 3.2.1
+- Python-dotenv 1.0.1
+- Docker 7.1.0
+#### Dependências de desenvolvimento:
+- Factory-boy 3.3.0
+- Freezegun 1.5.1
+- Pytest 8.3.2
+- Pytest-cov 5.0.0
+- Ruff 0.5.5
+- Taskipy 1.13.0
+- Testcontainers 4.7.2
+
 ## 🖥️ Instalação:
 
 1. Clone o repositório:
