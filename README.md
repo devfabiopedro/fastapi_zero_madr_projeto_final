@@ -3,10 +3,6 @@
 ## [FastAPI do zero](https://fastapidozero.dunossauro.com/)  
 # 📚 MADR - Projeto final.
 
-## 🌎 Pode ser visto funcionando aqui no Fly.io:  
-### ⚓ https://fastapi-madr.fly.dev/  
-
-
 Projeto final do curso de FastAPI do [Eduardo Mendes @dunossauro](https://github.com/dunossauro/fastapi-do-zero) do canal [Live de Python](https://www.youtube.com/@Dunossauro).
 
  
